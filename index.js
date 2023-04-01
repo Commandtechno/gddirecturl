@@ -19,11 +19,6 @@ exports.getMediaLink = getMediaLink;
  */
 async function getMediaLink(docId) {
     try {
-        const reqThumbnail = got.get('https://drive.google.com/thumbnail?sz=w320&id=' + docId, {
-            followRedirect: false
-        }).catch((x) => {
-            return null;
-        });
         
         const reqMedia = await got.get('https://drive.google.com/uc?id=' + docId + '&export=download', {
             followRedirect: false
@@ -35,7 +30,7 @@ async function getMediaLink(docId) {
         if (reqMedia.statusCode === 200) {
             //we got something to work on.
         }
-        else if (reqMedia.statusCode === 302) {
+        else if (reqMedia.statusCode > 300 && reqMedia.statusCode < 400) {
             const u = URL.parse(reqMedia.headers.location);
             if (u.hostname.endsWith('googleusercontent.com')) {
                 return createSuccessResponse(reqMedia.headers.location, null);
@@ -64,9 +59,7 @@ async function getMediaLink(docId) {
         });
 
         const videoSource = reqMediaConfirm.headers.location;
-        const thumbResponse = await reqThumbnail;
-        const thumbSource = (thumbResponse && thumbResponse.headers && thumbResponse.headers.location) || '';
-        return createSuccessResponse(videoSource, thumbSource);
+        return createSuccessResponse(videoSource, null);
     } catch (error) {
         throw ('Error while fetching the media link.' + error);
     }
