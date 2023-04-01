@@ -33,7 +33,7 @@ async function getMediaLink(docId) {
         else if (reqMedia.statusCode > 300 && reqMedia.statusCode < 400) {
             const u = URL.parse(reqMedia.headers.location);
             if (u.hostname.endsWith('googleusercontent.com')) {
-                return createSuccessResponse(reqMedia.headers.location, null);
+                return createSuccessResponse(reqMedia.headers.location);
             }
             else {
                 //redirect occurs, possibly media not shared.
@@ -59,7 +59,7 @@ async function getMediaLink(docId) {
         });
 
         const videoSource = reqMediaConfirm.headers.location;
-        return createSuccessResponse(videoSource, null);
+        return createSuccessResponse(videoSource);
     } catch (error) {
         throw ('Error while fetching the media link.' + error);
     }
@@ -72,9 +72,6 @@ function createFailedResponse(status, error) {
     }
 }
 
-function createSuccessResponse(videoSource, thumbSource) {
-    return {
-        src: videoSource,
-        thumbnail: thumbSource
-    };
+function createSuccessResponse(videoSource) {
+    return videoSource
 }
